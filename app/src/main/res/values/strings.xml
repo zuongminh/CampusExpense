@@ -4,6 +4,8 @@
         <item>Select expense Type</item>
         <item>Tuition Fee</item>
         <item>Food</item>
-        <item>Gifts for darling</item>
+        <item>Shopping</item>
+        <item>Transportation</item>
+        <item>Other</item>
     </string-array>
 </resources>
