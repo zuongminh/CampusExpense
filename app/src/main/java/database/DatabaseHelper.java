@@ -36,44 +36,58 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "DROP TABLE IF EXISTS " + ExpenseEntry.TABLE_NAME;
 
     private SQLiteDatabase database;
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         database = getWritableDatabase();
-
     }
+
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_ENTRIES);
     }
+
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         db.execSQL(SQL_DELETE_ENTRIES);
         onCreate(db);
     }
-    public void deleteExpense(int id){
-        database.delete(ExpenseEntry.TABLE_NAME,ExpenseEntry._ID + "=?",
+
+    public void deleteExpense(int id) {
+        database.delete(ExpenseEntry.TABLE_NAME, ExpenseEntry._ID + "=?",
                 new String[]{String.valueOf(id)});
         database.close();
     }
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onUpgrade(db, oldVersion, newVersion);
-    }
 
-    public long insertExpense(ExpenseEntity expense){
-
-        // Create a new map of values, where column names are the keys
+    public long insertExpense(ExpenseEntity expense) {
         ContentValues values = new ContentValues();
         values.put(ExpenseEntry.COLUMN_NAME_EXPENSENAME, expense.expenseName);
         values.put(ExpenseEntry.COLUMN_NAME_AMOUNT, expense.amount);
         values.put(ExpenseEntry.COLUMN_NAME_TYPE, expense.expenseType);
-        values.put(ExpenseEntry.COLUMN_NAME_DATE, expense.expenseDate.toString());
+        values.put(ExpenseEntry.COLUMN_NAME_DATE, expense.expenseDate);
 
-        // Insert the new row, returning the primary key value of the new row
         return database.insertOrThrow(ExpenseEntry.TABLE_NAME, null, values);
     }
 
+    public long updateExpense(ExpenseEntity expense) {
+        ContentValues values = new ContentValues();
+        values.put(ExpenseEntry.COLUMN_NAME_EXPENSENAME, expense.expenseName);
+        values.put(ExpenseEntry.COLUMN_NAME_AMOUNT, expense.amount);
+        values.put(ExpenseEntry.COLUMN_NAME_TYPE, expense.expenseType);
+        values.put(ExpenseEntry.COLUMN_NAME_DATE, expense.expenseDate);
+
+        return database.update(
+                ExpenseEntry.TABLE_NAME,
+                values,
+                ExpenseEntry._ID + " = ?",
+                new String[]{String.valueOf(expense.id)}
+        );
+    }
+
     public List<ExpenseEntity> getAllExpenses() {
-        Cursor results = database.query(ExpenseEntry.TABLE_NAME, new String[] {ExpenseEntry._ID,ExpenseEntry.COLUMN_NAME_EXPENSENAME,ExpenseEntry.COLUMN_NAME_AMOUNT,ExpenseEntry.COLUMN_NAME_TYPE, ExpenseEntry.COLUMN_NAME_DATE},
+        Cursor results = database.query(
+                ExpenseEntry.TABLE_NAME,
+                new String[]{ExpenseEntry._ID, ExpenseEntry.COLUMN_NAME_EXPENSENAME, ExpenseEntry.COLUMN_NAME_AMOUNT, ExpenseEntry.COLUMN_NAME_TYPE, ExpenseEntry.COLUMN_NAME_DATE},
                 null, null, null, null, ExpenseEntry.COLUMN_NAME_DATE);
 
         results.moveToFirst();
@@ -93,11 +107,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             expenses.add(expense);
             results.moveToNext();
         }
+        results.close();
 
         return expenses;
-
     }
-
-
-
 }

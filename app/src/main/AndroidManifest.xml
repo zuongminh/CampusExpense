@@ -13,6 +13,15 @@
         android:theme="@style/Theme.CampusExpense"
         tools:targetApi="31">
         <activity
+            android:name=".ListItemExpenseActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ReportActivity"
+            android:exported="false" />
+        <activity
             android:name=".AllExpenses"
             android:exported="false" />
         <activity
